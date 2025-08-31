@@ -1,63 +1,94 @@
-# AngularVoice
+---
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.0.
+# Angular Voice Recorder 🎙️
 
-## Code scaffolding
+A **standalone Angular component** for recording audio with live preview and modern glassy UI.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+* Angular 20+ compatible
+* Standalone: no need to import a module
+* Emits `recordingCompleted` when recording finishes
+* Input `previewRecord` to control audio preview
 
-```bash
-ng generate component component-name
+---
+
+## Features
+
+* Record audio directly in the browser
+* Real-time audio preview (controlled via `previewRecord`)
+* Emits a `File` object via `recordingCompleted` event
+* Sleek glassy design for buttons and audio preview
+* Supports WAV playback
+
+---
+
+## Usage
+
+### Import the Standalone Component
+
+```ts
+import { AngularVoice } from 'angular-voice';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [AngularVoice],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  showPreview = true;
+
+  onRecordingCompleted(file: File) {
+    console.log('Recorded file:', file);
+    // handle file upload or playback
+  }
+}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Template
+
+```html
+<angular-voice 
+  [previewRecord]="showPreview"
+  (recordingCompleted)="onRecordingCompleted($event)">
+</angular-voice>
+
+<button (click)="showPreview = !showPreview">Toggle Preview</button>
+```
+
+---
+
+## Development Server
 
 ```bash
-ng generate --help
+ng serve
 ```
+
+Open [http://localhost:4200](http://localhost:4200) in your browser. Changes auto-reload.
+
+---
 
 ## Building
 
-To build the library, run:
-
 ```bash
-ng build angular-voice
+ng build
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+Build artifacts go to `dist/`. Production builds are optimized for performance.
 
-### Publishing the Library
+---
 
-Once the project is built, you can publish your library by following these steps:
+## Testing
 
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/angular-voice
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Unit Tests
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### End-to-End Tests
 
 ```bash
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---# angular-voice

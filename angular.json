@@ -3,5 +3,121 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "angular-voice": {
+      "projectType": "library",
+      "root": "projects/angular-voice",
+      "sourceRoot": "projects/angular-voice/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/angular-voice/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/angular-voice/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/angular-voice/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "angular-voice-run": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "projects/angular-voice-run",
+      "sourceRoot": "projects/angular-voice-run/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/angular-voice-run/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/angular-voice-run/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/angular-voice-run/public"
+              }
+            ],
+            "styles": [
+              "projects/angular-voice-run/src/styles.css"
+            ],
+            "server": "projects/angular-voice-run/src/main.server.ts",
+            "outputMode": "server",
+            "ssr": {
+              "entry": "projects/angular-voice-run/src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "angular-voice-run:build:production"
+            },
+            "development": {
+              "buildTarget": "angular-voice-run:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/angular-voice-run/tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/angular-voice-run/public"
+              }
+            ],
+            "styles": [
+              "projects/angular-voice-run/src/styles.css"
+            ]
+          }
+        }
+      }
+    }
   }
 }

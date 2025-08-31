@@ -3,6 +3,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "angular-voice": [
+        "./dist/angular-voice"
+      ]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -22,5 +27,19 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/angular-voice/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/angular-voice/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/angular-voice-run/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/angular-voice-run/tsconfig.spec.json"
+    }
+  ]
 }

@@ -1,59 +1,94 @@
-# AngularVoiceWorkspace
+---
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.6.
+# Angular Voice Recorder 🎙️
 
-## Development server
+A **standalone Angular component** for recording audio with live preview and modern glassy UI.
 
-To start a local development server, run:
+* Angular 20+ compatible
+* Standalone: no need to import a module
+* Emits `recordingCompleted` when recording finishes
+* Input `previewRecord` to control audio preview
+
+---
+
+## Features
+
+* Record audio directly in the browser
+* Real-time audio preview (controlled via `previewRecord`)
+* Emits a `File` object via `recordingCompleted` event
+* Sleek glassy design for buttons and audio preview
+* Supports WAV playback
+
+---
+
+## Usage
+
+### Import the Standalone Component
+
+```ts
+import { VoiceRecorderComponent } from 'angular-voice-recorder';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [VoiceRecorderComponent],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  showPreview = true;
+
+  onRecordingCompleted(file: File) {
+    console.log('Recorded file:', file);
+    // handle file upload or playback
+  }
+}
+```
+
+### Template
+
+```html
+<voice-recorder 
+  [previewRecord]="showPreview"
+  (recordingCompleted)="onRecordingCompleted($event)">
+</voice-recorder>
+
+<button (click)="showPreview = !showPreview">Toggle Preview</button>
+```
+
+---
+
+## Development Server
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open [http://localhost:4200](http://localhost:4200) in your browser. Changes auto-reload.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
+---
 
 ## Building
-
-To build the project run:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Build artifacts go to `dist/`. Production builds are optimized for performance.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Testing
+
+### Unit Tests
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+### End-to-End Tests
 
 ```bash
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---# angular-voice

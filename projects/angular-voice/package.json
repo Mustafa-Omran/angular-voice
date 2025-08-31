@@ -1,6 +1,6 @@
 {
   "name": "angular-voice",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "peerDependencies": {
     "@angular/common": "^20.2.0",
     "@angular/core": "^20.2.0"
@@ -8,5 +8,26 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "keywords": [
+    "angular",
+    "angular voice",
+    "angular voice recorder",
+    "angular audio",
+    "angular audio recorder",
+    "audio",
+    "recorder",
+    "voice",
+    "voice recorder",
+    "microphone",
+    "mic",
+    "wav",
+    "audio recording",
+    "web audio api",
+    "angular standalone",
+    "angular 20",
+    "angular component",
+    "angular ui"
+  ],
+  "description": "Angular Voice Recorder, a standalone Angular component for recording audio with live preview and glassy UI."
 }

@@ -45,10 +45,10 @@ export class AppComponent {
 ### Template
 
 ```html
-<voice-recorder 
+<angular-voice 
   [previewRecord]="showPreview"
   (recordingCompleted)="onRecordingCompleted($event)">
-</voice-recorder>
+</angular-voice>
 
 <button (click)="showPreview = !showPreview">Toggle Preview</button>
 ```

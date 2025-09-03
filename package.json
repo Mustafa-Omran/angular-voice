@@ -9,7 +9,8 @@
     "build:lib:watch": "ng build angular-voice --watch --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:angular-voice-run": "node dist/angular-voice-run/server/server.mjs"
+    "serve:ssr:angular-voice-run": "node dist/angular-voice-run/server/server.mjs",
+    "publish:package": "cd dist/angular-voice && npm publish --access public"
   },
   "prettier": {
     "printWidth": 100,

@@ -26,12 +26,12 @@ A **standalone Angular component** for recording audio with live preview and mod
 ### Import the Standalone Component
 
 ```ts
-import { AngularVoice } from 'angular-voice';
+import { VoiceRecorderComponent } from 'angular-voice-recorder';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AngularVoice],
+  imports: [VoiceRecorderComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
@@ -47,10 +47,10 @@ export class AppComponent {
 ### Template
 
 ```html
-<angular-voice 
+<voice-recorder 
   [previewRecord]="showPreview"
   (recordingCompleted)="onRecordingCompleted($event)">
-</angular-voice>
+</voice-recorder>
 
 <button (click)="showPreview = !showPreview">Toggle Preview</button>
 ```

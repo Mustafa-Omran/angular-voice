@@ -1,5 +1,3 @@
----
-
 # Angular Voice Recorder 🎙️
 
 A **standalone Angular component** for recording audio with live preview and modern glassy UI.
@@ -26,12 +24,12 @@ A **standalone Angular component** for recording audio with live preview and mod
 ### Import the Standalone Component
 
 ```ts
-import { VoiceRecorderComponent } from 'angular-voice-recorder';
+import { AngularVoice } from 'angular-voice';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [VoiceRecorderComponent],
+  imports: [AngularVoice],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
@@ -90,5 +88,3 @@ ng test
 ```bash
 ng e2e
 ```
-
----# angular-voice

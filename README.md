@@ -24,7 +24,7 @@ A **standalone Angular component** for recording audio with live preview and mod
 ### Import the Standalone Component
 
 ```ts
-import { VoiceRecorderComponent } from 'angular-voice-recorder';
+import { AngularVoice } from 'angular-voice';
 
 @Component({
   selector: 'app-root',

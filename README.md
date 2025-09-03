@@ -29,7 +29,7 @@ import { AngularVoice } from 'angular-voice';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [VoiceRecorderComponent],
+  imports: [AngularVoice],
   templateUrl: './app.component.html',
 })
 export class AppComponent {

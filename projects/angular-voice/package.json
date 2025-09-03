@@ -9,6 +9,14 @@
     "tslib": "^2.3.0"
   },
   "sideEffects": false,
+    "repository": {
+    "type": "git",
+    "url": "https://github.com/mustafa-omran/angular-voice"
+  },
+  "bugs": {
+    "url": "https://github.com/mustafa-omran/angular-voice/issues"
+  },
+  "homepage": "https://github.com/mustafa-omran/angular-voice#readme",
   "keywords": [
     "angular",
     "angular voice",

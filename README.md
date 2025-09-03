@@ -1,5 +1,3 @@
----
-
 # Angular Voice Recorder 🎙️
 
 A **standalone Angular component** for recording audio with live preview and modern glassy UI.
@@ -90,5 +88,3 @@ ng test
 ```bash
 ng e2e
 ```
-
----# angular-voice

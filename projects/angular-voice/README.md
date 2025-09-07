@@ -1,6 +1,3 @@
-Here’s a **cleaned-up and properly formatted Markdown** version of your Angular Voice Recorder README. I fixed the table formatting, heading structure, and spacing to improve readability.
-
-````markdown
 # Angular Voice Recorder 🎙️
 
 A **standalone Angular component** for recording audio with live preview and a modern glassy UI.

@@ -1,1 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+.custom-style {
+    background-color: red;
+    font-weight: bold;
+    font-size: 20rem;
+}

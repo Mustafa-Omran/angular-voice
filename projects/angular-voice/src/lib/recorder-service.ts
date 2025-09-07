@@ -1,41 +1,61 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable } from '@angular/core';
 
 export type RecorderFormat = 'webm' | 'wav';
 
 export interface RecordingResult {
-  blob: Blob;
-  file: File;
-  durationMs: number;
-  mimeType: string;
+  blob: Blob;     // raw audio data
+  file: File;     // audio as a File (can be uploaded/saved)
+  durationMs: number; // recording duration in milliseconds
+  mimeType: string;   // type of audio (webm/wav)
 }
 
+/**
+ * AudioRecorderService
+ * --------------------
+ * This service lets you record audio from the user's microphone.
+ * It supports two formats:
+ *   - WEBM (default, smaller file size, better quality)
+ *   - WAV (fallback, bigger files but works everywhere)
+ *
+ * How it works:
+ *   1. Ask the browser for microphone access.
+ *   2. Start recording using MediaRecorder (WEBM) or AudioWorklet (WAV).
+ *   3. Stop recording and return the audio as File + Blob.
+ */
 @Injectable({ providedIn: 'root' })
 export class AudioRecorderService {
+  // MediaRecorder path (for webm)
   private mediaStream?: MediaStream;
   private mediaRecorder?: MediaRecorder;
   private chunks: Blob[] = [];
-  private startTs = 0;
 
+  // WAV path (AudioWorklet)
   private audioCtx?: AudioContext;
   private sourceNode?: MediaStreamAudioSourceNode;
-  private processorNode?: ScriptProcessorNode;
+  private workletNode?: AudioWorkletNode;
   private pcmBuffers: Float32Array[] = [];
-  private sampleRate = 48000; // updated from AudioContext once started
+  private sampleRate = 48000;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  private startTs = 0;
 
-  get isBrowser() { return isPlatformBrowser(this.platformId); }
+  /** Quick check: are we in a browser with mic support? */
+  get isBrowser() {
+    return typeof window !== 'undefined' && !!navigator?.mediaDevices;
+  }
 
-  /** Ask for mic permission and create the stream */
+  /** Ask the user for microphone permission (runs once) */
   async prepare(): Promise<void> {
     if (!this.isBrowser) return;
-    if (this.mediaStream) return;
+    if (this.mediaStream) return; // already prepared
 
     this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   }
 
-  /** Start recording in chosen format */
+  /**
+   * Start recording
+   * @param format 'webm' (default) or 'wav'
+   * @param desiredSampleRate optional sample rate (e.g., 44100)
+   */
   async start(format: RecorderFormat = 'webm', desiredSampleRate?: number): Promise<void> {
     if (!this.isBrowser) throw new Error('Recording only works in browser.');
     await this.prepare();
@@ -44,38 +64,56 @@ export class AudioRecorderService {
     this.pcmBuffers = [];
     this.startTs = performance.now();
 
+    // --- Case 1: WEBM (MediaRecorder, smaller, modern) ---
     if (format === 'webm' && this.supportsMediaRecorder('audio/webm')) {
-      // MediaRecorder path (smaller files, great quality)
       const mimeType = this.pickWebmMime();
       this.mediaRecorder = new MediaRecorder(this.mediaStream!, { mimeType });
-      this.mediaRecorder.ondataavailable = (e) => { if (e.data?.size) this.chunks.push(e.data); };
-      this.mediaRecorder.start(); // you can pass timeslice if you want periodic chunks
+      this.mediaRecorder.ondataavailable = (e) => {
+        if (e.data?.size) this.chunks.push(e.data);
+      };
+      this.mediaRecorder.start();
       return;
     }
 
-    // WAV fallback (works widely, larger files)
-    // Build a simple ScriptProcessor chain to capture PCM
-    this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({
-      sampleRate: desiredSampleRate ?? undefined,
-    }) as AudioContext;
+    // --- Case 2: WAV (AudioWorklet, fallback) ---
+    this.audioCtx = new AudioContext({ sampleRate: desiredSampleRate ?? undefined });
     this.sampleRate = this.audioCtx.sampleRate;
 
+    // Build a tiny recorder processor dynamically
+    const workletCode = `
+      class RecorderProcessor extends AudioWorkletProcessor {
+        process(inputs) {
+          const input = inputs[0];
+          if (input && input[0]) {
+            this.port.postMessage(input[0]); // send raw PCM data
+          }
+          return true;
+        }
+      }
+      registerProcessor('recorder-processor', RecorderProcessor);
+    `;
+    const blob = new Blob([workletCode], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    await this.audioCtx.audioWorklet.addModule(url);
+
     this.sourceNode = this.audioCtx.createMediaStreamSource(this.mediaStream!);
-    // ScriptProcessor is deprecated but still widely supported; AudioWorklet would be the modern alt.
-    this.processorNode = this.audioCtx.createScriptProcessor(4096, 1, 1);
-    this.processorNode.onaudioprocess = (e) => {
-      const input = e.inputBuffer.getChannelData(0);
-      // Copy the chunk so it doesn't mutate
-      this.pcmBuffers.push(new Float32Array(input));
+    this.workletNode = new AudioWorkletNode(this.audioCtx, 'recorder-processor');
+    this.workletNode.port.onmessage = (event) => {
+      // Copy the audio data so it’s safe
+      this.pcmBuffers.push(new Float32Array(event.data));
     };
-    this.sourceNode.connect(this.processorNode);
-    this.processorNode.connect(this.audioCtx.destination);
+
+    this.sourceNode.connect(this.workletNode);
+    this.workletNode.connect(this.audioCtx.destination);
   }
 
-  /** Stop and produce RecordingResult */
+  /**
+   * Stop recording and return the result
+   */
   async stop(format: RecorderFormat = 'webm'): Promise<RecordingResult> {
     const durationMs = performance.now() - this.startTs;
 
+    // --- WEBM path ---
     if (format === 'webm' && this.mediaRecorder) {
       const recorder = this.mediaRecorder;
       const stopPromise = new Promise<void>((resolve) => {
@@ -90,71 +128,77 @@ export class AudioRecorderService {
       return { blob, file, durationMs, mimeType: blob.type };
     }
 
-    // WAV path
+    // --- WAV path ---
     const wavBlob = this.encodeWavFromPcm(this.pcmBuffers, this.sampleRate);
     const file = new File([wavBlob], `recording-${Date.now()}.wav`, { type: 'audio/wav' });
     this.cleanupWav();
     return { blob: wavBlob, file, durationMs, mimeType: 'audio/wav' };
   }
 
-  /** Optional controls */
+  /** Pause recording (if supported) */
   pause(): void {
-    if (this.mediaRecorder && this.mediaRecorder.state === 'recording' && this.mediaRecorder.pause) {
-      this.mediaRecorder.pause();
+    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      this.mediaRecorder.pause?.();
     }
-    // For WAV (processor), pausing means temporarily detach the onaudioprocess
-    if (this.processorNode) this.processorNode.onaudioprocess = null;
+    if (this.workletNode) {
+      this.workletNode.port.onmessage = null; // stop collecting
+    }
   }
 
+  /** Resume recording (if supported) */
   resume(): void {
-    if (this.mediaRecorder && this.mediaRecorder.state === 'paused' && this.mediaRecorder.resume) {
-      this.mediaRecorder.resume();
+    if (this.mediaRecorder && this.mediaRecorder.state === 'paused') {
+      this.mediaRecorder.resume?.();
     }
-    if (this.processorNode) {
-      this.processorNode.onaudioprocess = (e) => {
-        const input = e.inputBuffer.getChannelData(0);
-        this.pcmBuffers.push(new Float32Array(input));
+    if (this.workletNode) {
+      this.workletNode.port.onmessage = (event) => {
+        this.pcmBuffers.push(new Float32Array(event.data));
       };
     }
   }
 
-  /** Helpers */
+  /** --- Helpers below --- */
+
+  /** Check if MediaRecorder supports a mime type */
   private supportsMediaRecorder(mime: string): boolean {
     return typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported?.(mime);
   }
 
+  /** Pick the best WEBM mime type available */
   private pickWebmMime(): string {
-    // Prefer OPUS in WEBM when available
     const candidates = [
       'audio/webm;codecs=opus',
       'audio/webm',
-      'audio/webm;codecs=pcm', // very rare
+      'audio/webm;codecs=pcm',
     ];
     for (const c of candidates) if (this.supportsMediaRecorder(c)) return c;
     return 'audio/webm';
   }
 
+  /** Cleanup for webm recorder */
   private cleanupMediaRecorder() {
     this.mediaRecorder = undefined;
     this.chunks = [];
-    // Keep the stream alive if you want to record again without permission prompt.
   }
 
+  /** Cleanup for wav recorder */
   private cleanupWav() {
     try {
-      this.processorNode?.disconnect();
+      this.workletNode?.disconnect();
       this.sourceNode?.disconnect();
       this.audioCtx?.close();
     } catch { }
-    this.processorNode = undefined;
+    this.workletNode = undefined;
     this.sourceNode = undefined;
     this.audioCtx = undefined;
     this.pcmBuffers = [];
   }
 
-  /** PCM Float32 -> WAV Blob (mono) */
+  /**
+   * Convert PCM float audio to a WAV Blob (mono, 16-bit PCM)
+   */
   private encodeWavFromPcm(buffers: Float32Array[], sampleRate: number): Blob {
-    // Concatenate
+    // Join all audio chunks into one array
     const totalLength = buffers.reduce((acc, b) => acc + b.length, 0);
     const interleaved = new Float32Array(totalLength);
     let offset = 0;
@@ -170,7 +214,7 @@ export class AudioRecorderService {
       pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
     }
 
-    // WAV header (PCM, mono)
+    // Build WAV file header
     const blockAlign = 1 * 16 / 8;
     const byteRate = sampleRate * blockAlign;
     const dataSize = pcm16.length * 2;
@@ -182,21 +226,21 @@ export class AudioRecorderService {
     const write16 = (v: number) => { view.setUint16(p, v, true); p += 2; };
     const write32 = (v: number) => { view.setUint32(p, v, true); p += 4; };
 
-    writeStr('RIFF');                  // RIFF
-    write32(36 + dataSize);            // file size - 8
-    writeStr('WAVE');                  // WAVE
-    writeStr('fmt ');                  // fmt chunk
-    write32(16);                       // PCM header size
-    write16(1);                        // PCM = 1
-    write16(1);                        // channels = 1 (mono)
-    write32(sampleRate);               // sample rate
-    write32(byteRate);                 // byte rate
-    write16(blockAlign);               // block align
-    write16(16);                       // bits per sample
-    writeStr('data');                  // data chunk
-    write32(dataSize);                 // data size
+    writeStr('RIFF');
+    write32(36 + dataSize);
+    writeStr('WAVE');
+    writeStr('fmt ');
+    write32(16);
+    write16(1);
+    write16(1);
+    write32(sampleRate);
+    write32(byteRate);
+    write16(blockAlign);
+    write16(16);
+    writeStr('data');
+    write32(dataSize);
 
-    // PCM data
+    // PCM samples
     let idx = 44;
     const u8 = new Uint8Array(buffer);
     for (let i = 0; i < pcm16.length; i++, idx += 2) {

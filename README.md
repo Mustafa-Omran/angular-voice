@@ -1,29 +1,33 @@
 # Angular Voice Recorder 🎙️
 
-A **standalone Angular component** for recording audio with live preview and modern glassy UI.
+A **standalone Angular component** for recording audio with live preview and a modern glassy UI.
 
-* Angular 20+ compatible
-* Standalone: no need to import a module
-* Emits `recordingCompleted` when recording finishes
-* Input `previewRecord` to control audio preview
-
----
-
-## Features
-
-* Record audio directly in the browser
-* Real-time audio preview (controlled via `previewRecord`)
-* Emits a `File` object via `recordingCompleted` event
-* Sleek glassy design for buttons and audio preview
-* Supports WAV playback
+* ✅ **Angular 20+** compatible
+* ✅ **Standalone**: No module import required
+* ✅ **Event-driven**: Emits `recordingCompleted` when recording finishes
+* ✅ **Customizable**: Button labels, styles, and preview toggle
+* ✅ **Cross-browser**: WAV support everywhere, WebM where supported
 
 ---
 
-## Usage
+## ✨ Features
 
-### Import the Standalone Component
+## | **Feature** | **Description** | | --- | --- | | Record Audio | Capture audio directly in the browser | | Live Preview | Toggle real-time audio preview with previewRecord | | Event Emission | Emits a File object via recordingCompleted | | Sleek UI | Glassy design for buttons and preview player | | Cross-Browser | Works with WAV (universal) and WebM (where supported) |
 
-```ts
+## 📦 Installation
+
+```bash
+npm install angular-voice
+```
+
+---
+
+## 🚀 Usage
+
+### 1. Import the Component
+
+```typescript
+import { Component } from '@angular/core';
 import { AngularVoice } from 'angular-voice';
 
 @Component({
@@ -35,56 +39,87 @@ import { AngularVoice } from 'angular-voice';
 export class AppComponent {
   showPreview = true;
 
-  onRecordingCompleted(file: File) {
+  onRecordingCompleted(file: File | null) {
     console.log('Recorded file:', file);
-    // handle file upload or playback
+    // Handle the file (upload, store, or play)
   }
 }
 ```
 
-### Template
+---
+
+### 2. Template Example
 
 ```html
-<angular-voice 
+<angular-voice
   [previewRecord]="showPreview"
+  [displayBtnsLabels]="true"
+  startRecordingBtnLabel="🎙️ Start Recording"
+  recordingBtnLabel="⏺️ Stop Recording"
+  startBtnClass="btn btn-success"
+  recordingBtnClass="btn btn-danger"
   (recordingCompleted)="onRecordingCompleted($event)">
 </angular-voice>
 
-<button (click)="showPreview = !showPreview">Toggle Preview</button>
+<button (click)="showPreview = !showPreview">
+  Toggle Preview
+</button>
 ```
 
 ---
 
-## Development Server
+## 🔧 Inputs
+
+## | **Input** | **Type** | **Default** | **Description** | | --- | --- | --- | --- | | previewRecord | boolean | false | Show/hide audio preview after recording. | | displayBtnsLabels | boolean | true | Show/hide button text (icons remain). | | startRecordingBtnLabel | string | "Start recording" | Label for the start button. | | recordingBtnLabel | string | "Recording..." | Label for the recording button. | | startBtnClass | string | "" | Extra CSS class(es) for the start button. | | recordingBtnClass | string | "" | Extra CSS class(es) for the recording button. |
+
+## 📤 Outputs
+
+## | **Output** | **Payload** | **Description** | | --- | --- | --- | | recordingCompleted | File | null | Emits the recorded file or null if canceled. |
+
+## 🧑‍💻 Development
+
+### Run Demo App
 
 ```bash
 ng serve
 ```
 
-Open [http://localhost:4200](http://localhost:4200) in your browser. Changes auto-reload.
+Open <http://localhost:4200> in your browser. The app reloads automatically on code changes.
 
 ---
 
-## Building
+### Build Library
 
 ```bash
 ng build
 ```
 
-Build artifacts go to `dist/`. Production builds are optimized for performance.
+Build artifacts are stored in `dist/`.
 
 ---
 
-## Testing
+### Testing
 
-### Unit Tests
+#### Unit Tests
 
 ```bash
 ng test
 ```
 
-### End-to-End Tests
+#### End-to-End Tests
 
 ```bash
 ng e2e
 ```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/my-feature`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/my-feature`).
+5. Open a Pull Request 🎉.
+
+---

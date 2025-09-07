@@ -9,4 +9,8 @@ import { AngularVoice } from 'angular-voice';
 })
 export class App {
   protected readonly title = signal('angular-voice-run');
+
+  onRecordingCompleted(file: File | null) {
+    console.log(file);
+  }
 }

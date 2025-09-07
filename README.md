@@ -1,3 +1,6 @@
+Here’s a **cleaned-up and properly formatted Markdown** version of your Angular Voice Recorder README. I fixed the table formatting, heading structure, and spacing to improve readability.
+
+````markdown
 # Angular Voice Recorder 🎙️
 
 A **standalone Angular component** for recording audio with live preview and a modern glassy UI.
@@ -12,13 +15,21 @@ A **standalone Angular component** for recording audio with live preview and a m
 
 ## ✨ Features
 
-## | **Feature** | **Description** | | --- | --- | | Record Audio | Capture audio directly in the browser | | Live Preview | Toggle real-time audio preview with previewRecord | | Event Emission | Emits a File object via recordingCompleted | | Sleek UI | Glassy design for buttons and preview player | | Cross-Browser | Works with WAV (universal) and WebM (where supported) |
+| **Feature**       | **Description**                             |
+|------------------|---------------------------------------------|
+| Record Audio      | Capture audio directly in the browser       |
+| Live Preview      | Toggle real-time audio preview with `previewRecord` |
+| Event Emission    | Emits a File object via `recordingCompleted` |
+| Sleek UI          | Glassy design for buttons and preview player |
+| Cross-Browser     | Works with WAV (universal) and WebM (where supported) |
+
+---
 
 ## 📦 Installation
 
 ```bash
 npm install angular-voice
-```
+````
 
 ---
 
@@ -70,11 +81,24 @@ export class AppComponent {
 
 ## 🔧 Inputs
 
-## | **Input** | **Type** | **Default** | **Description** | | --- | --- | --- | --- | | previewRecord | boolean | false | Show/hide audio preview after recording. | | displayBtnsLabels | boolean | true | Show/hide button text (icons remain). | | startRecordingBtnLabel | string | "Start recording" | Label for the start button. | | recordingBtnLabel | string | "Recording..." | Label for the recording button. | | startBtnClass | string | "" | Extra CSS class(es) for the start button. | | recordingBtnClass | string | "" | Extra CSS class(es) for the recording button. |
+| **Input**                | **Type** | **Default**       | **Description**                               |
+| ------------------------ | -------- | ----------------- | --------------------------------------------- |
+| `previewRecord`          | boolean  | false             | Show/hide audio preview after recording.      |
+| `displayBtnsLabels`      | boolean  | true              | Show/hide button text (icons remain).         |
+| `startRecordingBtnLabel` | string   | "Start recording" | Label for the start button.                   |
+| `recordingBtnLabel`      | string   | "Recording..."    | Label for the recording button.               |
+| `startBtnClass`          | string   | ""                | Extra CSS class(es) for the start button.     |
+| `recordingBtnClass`      | string   | ""                | Extra CSS class(es) for the recording button. |
+
+---
 
 ## 📤 Outputs
 
-## | **Output** | **Payload** | **Description** | | --- | --- | --- | | recordingCompleted | File | null | Emits the recorded file or null if canceled. |
+| **Output**           | **Payload**  | **Description**                              |
+| -------------------- | ------------ | -------------------------------------------- |
+| `recordingCompleted` | File \| null | Emits the recorded file or null if canceled. |
+
+---
 
 ## 🧑‍💻 Development
 
@@ -84,7 +108,7 @@ export class AppComponent {
 ng serve
 ```
 
-Open <http://localhost:4200> in your browser. The app reloads automatically on code changes.
+Open [http://localhost:4200](http://localhost:4200) in your browser. The app reloads automatically on code changes.
 
 ---
 
@@ -120,6 +144,4 @@ ng e2e
 2. Create a new branch (`git checkout -b feature/my-feature`).
 3. Commit your changes (`git commit -m 'Add some feature'`).
 4. Push to the branch (`git push origin feature/my-feature`).
-5. Open a Pull Request 🎉.
-
----
+5. Open a Pull Request 🎉
